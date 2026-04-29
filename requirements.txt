@@ -1,0 +1,6 @@
+unsloth
+torch
+xformers
+bitsandbytes
+python-dotenv
+pydantic
