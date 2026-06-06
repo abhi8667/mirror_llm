@@ -1,6 +1,6 @@
 # MIRROR LLM 🪞
 
-[![License](https://img.shields.io/badge/license-unspecified-lightgrey)](#license)
+[![License](https://img.shields.io/badge/license-to%20be%20determined-lightgrey)](#license)
 [![Release](https://img.shields.io/github/v/release/abhi8667/mirror_llm?include_prereleases)](https://github.com/abhi8667/mirror_llm/releases)
 [![Build](https://img.shields.io/badge/build-not%20configured-lightgrey)](#roadmap)
 [![Tests](https://img.shields.io/badge/tests-not%20configured-lightgrey)](#roadmap)
@@ -173,12 +173,12 @@ python main.py
 python src/vram_monitor.py
 ```
 
-### Basic User Flow Checklist
-- [ ] Initialize ledger with `submission_prep.py`
-- [ ] Start either Streamlit or CLI interface
-- [ ] Send prompt and inspect Observer state
-- [ ] Review calibrated Actor response
-- [ ] Reset session when needed
+### Basic User Flow
+1. Initialize ledger with `submission_prep.py`.
+2. Start either Streamlit or CLI interface.
+3. Send a prompt and inspect Observer state.
+4. Review calibrated Actor response.
+5. Reset the session when needed.
 
 ---
 
