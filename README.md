@@ -1,158 +1,256 @@
-# Project MIRROR 🪞 | Theory of Mind AI
+# MIRROR LLM 🪞
 
-**Project MIRROR** is a local, privacy-first AI mentor that builds a real-time "Theory of Mind" of the user. A decoupled **Shadow Loop** runs two LLMs back-to-back on consumer hardware: a small **Observer** model silently analyses every message for cognitive load, knowledge gaps, and emotional vibe, then passes a structured strategy to a larger **Actor** model that delivers a fully personalised response.
+[![License](https://img.shields.io/badge/license-to%20be%20determined-lightgrey)](#license)
+[![Release](https://img.shields.io/github/v/release/abhi8667/mirror_llm?include_prereleases)](https://github.com/abhi8667/mirror_llm/releases)
+[![Build](https://img.shields.io/badge/build-not%20configured-lightgrey)](#roadmap)
+[![Tests](https://img.shields.io/badge/tests-not%20configured-lightgrey)](#roadmap)
+[![Coverage](https://img.shields.io/badge/coverage-not%20configured-lightgrey)](#roadmap)
+[![Docs](https://img.shields.io/badge/docs-README-blue)](README.md)
+[![Stars](https://img.shields.io/github/stars/abhi8667/mirror_llm)](https://github.com/abhi8667/mirror_llm/stargazers)
+[![Forks](https://img.shields.io/github/forks/abhi8667/mirror_llm)](https://github.com/abhi8667/mirror_llm/network/members)
+[![Issues](https://img.shields.io/github/issues/abhi8667/mirror_llm)](https://github.com/abhi8667/mirror_llm/issues)
+[![PRs](https://img.shields.io/github/issues-pr/abhi8667/mirror_llm)](https://github.com/abhi8667/mirror_llm/pulls)
 
-Because both models run locally via [Unsloth](https://github.com/unslothai/unsloth) 4-bit quantisation, your private cognitive profile never leaves your machine.
+**A local, dual-agent mentorship system that analyzes user cognitive state and generates calibrated responses on consumer GPUs.**
 
----
+MIRROR LLM is a privacy-first AI application built around a sequential “Shadow Loop”: a lightweight **Observer** model performs structured state extraction (load, vibe, knowledge gaps), and a larger **Actor** model uses that state to produce context-aware responses.
 
-## 🌊 Life of a Message: The Shadow-Loop Trace
-
-1. **Input** – `app.py` (Streamlit) or `main.py` (CLI) captures the user query.
-2. **Analysis** – `src/agents.py` (**Observer 3B** · `Llama-3.2-3B-Instruct`) intercepts the query and extracts cognitive load, knowledge gaps, and vibe into a structured JSON payload.
-3. **Persistence** – `src/storage_manager.py` appends a timestamped snapshot to the **Cognitive Ledger** (`data/session_mirror.json`).
-4. **Calibration** – A context summary of the last 3 turns is woven into the **Actor 8B**'s system prompt together with the Observer's strategy.
-5. **Response** – `src/agents.py` (**Actor 8B** · `Llama-3.1-8B-Instruct`) generates the final pedagogically-calibrated reply.
-
----
-
-## 🗺️ Component Map
-
-| File | Responsibility | Core Tech |
-| :--- | :--- | :--- |
-| `app.py` | "Glass Box" UI & live dashboard | Streamlit |
-| `main.py` | CLI entry point & loop orchestrator | Python, Torch |
-| `src/agents.py` | Dual-agent cognitive engine (Observer + Actor) | Unsloth, Llama 3.1 / 3.2 |
-| `src/storage_manager.py` | Persistence & context weaving | JSON, Python |
-| `src/vram_monitor.py` | Real-time VRAM usage utility | Torch |
-| `prompts/` | System personas & strategy templates | Plain text |
-| `data/` | Chronological Cognitive Ledger | JSON snapshots |
-| `submission_prep.py` | One-shot project sanitisation / reset script | Python |
+The project is optimized for 6GB VRAM NVIDIA hardware using Unsloth 4-bit quantization, explicit VRAM cache management, and strict sequential inference. All session data remains local in a JSON ledger.
 
 ---
 
-## ⚙️ Hardware Requirements
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [FAQ](#faq)
+- [License](#license)
+
+---
+
+## Overview
+
+### Problem Statement
+Most local assistants produce generic responses and do not explicitly reason about user cognitive context turn-by-turn.
+
+### Why MIRROR Exists
+MIRROR introduces a two-model architecture where cognitive analysis is isolated from response generation. This separation provides better controllability, interpretability, and resource efficiency compared to a single monolithic prompt loop.
+
+### Intended Users
+- Developers building local-first AI systems
+- Researchers exploring theory-of-mind-inspired interaction loops
+- Students learning practical multi-agent orchestration
+- Builders targeting low-VRAM deployment constraints
+
+### Real-World Applications
+- Educational assistants with adaptive teaching tone
+- Coaching copilots with per-turn strategy injection
+- Human-in-the-loop experimentation for cognitive personalization
+
+> [!NOTE]
+> Repository: https://github.com/abhi8667/mirror_llm
+
+---
+
+## Key Features
+
+### Core Features
+- Sequential dual-agent pipeline: **Observer (3B)** → **Actor (8B)**
+- Structured observer output (`knowledge_gap`, `load_score`, `vibe`, `strategy_instruction`)
+- Local persistence via chronological cognitive ledger (`data/session_mirror.json`)
+- Streamlit “glass box” UI and CLI interface
+
+### Advanced Features
+- 4-bit quantized inference with Unsloth + bitsandbytes
+- Explicit VRAM safety controls (`torch.cuda.empty_cache()` + `gc.collect()`)
+- Recent-history weaving for response calibration
+- Observer JSON extraction fallback handling for robust local model outputs
+
+### Developer Experience
+- Simple Python project layout
+- Prompt files separated from orchestration logic
+- Built-in project reset utility (`submission_prep.py`)
+- Lightweight VRAM diagnostic (`src/vram_monitor.py`)
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TD
+    U[User Input] --> I{Interface}
+    I -->|Web| S[Streamlit app.py]
+    I -->|CLI| C[main.py]
+
+    S --> O[ObserverAgent\nLlama-3.2-3B-Instruct\n4-bit]
+    C --> O
+
+    O -->|JSON state| L[(Cognitive Ledger\ndata/session_mirror.json)]
+    L --> H[Recent History Weave]
+
+    O --> A[ActorAgent\nLlama-3.1-8B-Instruct\n4-bit]
+    H --> A
+
+    A --> R[Calibrated Mentor Response]
+    R --> U
+```
+
+### Runtime Flow
+1. Capture user input from Streamlit or CLI.
+2. Run Observer inference and extract structured cognitive state.
+3. Retrieve recent history from ledger.
+4. Inject strategy + history into Actor system prompt.
+5. Generate response and append snapshot to ledger.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Python |
+| LLM Runtime | Unsloth, Transformers-compatible model loading |
+| Models | Llama-3.2-3B-Instruct (Observer), Llama-3.1-8B-Instruct (Actor) |
+| Quantization | bitsandbytes 4-bit |
+| UI | Streamlit |
+| Compute | PyTorch + CUDA |
+| Config | python-dotenv |
+| Storage | Local JSON ledger |
+
+---
+
+## Getting Started
+
+### Prerequisites
 
 | Requirement | Minimum |
-| :--- | :--- |
-| GPU | NVIDIA GPU with **6 GB VRAM** (tested on RTX 4050) |
-| CUDA | 11.8 or later |
-| RAM | 16 GB system RAM recommended |
-| Python | 3.10 or later |
+|---|---|
+| Python | 3.10+ |
+| GPU | NVIDIA CUDA-capable GPU (tested on 6GB VRAM RTX 4050) |
+| CUDA | 11.8+ recommended |
 
-> **Why 6 GB?** Unsloth 4-bit quantisation fits the combined ~11 B parameters (3 B Observer + 8 B Actor) into 6 GB by running the two models *sequentially* and aggressively purging VRAM between turns.
-
----
-
-## 🚀 Getting Started
-
-### 1 · Clone the repository
+### Installation
 
 ```bash
 git clone https://github.com/abhi8667/mirror_llm.git
 cd mirror_llm
-```
-
-### 2 · Create and activate a virtual environment (recommended)
-
-```bash
 python -m venv .venv
-# Linux / macOS
-source .venv/bin/activate
-# Windows
-.venv\Scripts\activate
-```
-
-### 3 · Install dependencies
-
-```bash
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-> Unsloth and bitsandbytes require a CUDA-capable GPU. If you hit installation issues, follow the [Unsloth installation guide](https://github.com/unslothai/unsloth#installation) for your specific CUDA version.
-
-### 4 · Initialise the data directory
-
-```bash
 python submission_prep.py
 ```
 
-This creates `data/session_mirror.json` (an empty ledger) and verifies all core files are present.
-
-### 5 · (Optional) Create a `.env` file
-
-A `.env` file is loaded automatically if present. You can use it to set environment variables, for example:
-
-```
-# .env – add any custom environment variables here
-HF_TOKEN=your_huggingface_token   # only needed for gated models
-```
+> [!TIP]
+> If Unsloth/bitsandbytes installation fails for your CUDA version, follow the upstream installation matrix in the Unsloth documentation.
 
 ---
 
-## ▶️ Running the Project
+## Usage
 
-### Option A – Streamlit Web UI (recommended)
+### Run Web UI (recommended)
 
 ```bash
 streamlit run app.py
 ```
 
-Open the URL shown in the terminal (usually `http://localhost:8501`). The dual-panel dashboard shows the live **Shadow Brain** analysis alongside the mentor conversation.
-
-**Sidebar controls:**
-- **Show Raw Observer logic** – toggles the raw JSON payload from the Observer.
-- **CLEAR SESSION (VRAM Purge)** – wipes the conversation, resets the ledger, and calls `torch.cuda.empty_cache()`.
-
-### Option B – CLI
+### Run CLI
 
 ```bash
 python main.py
 ```
 
-The CLI runs a hardware pre-flight check (GPU name + VRAM), then starts the interactive prompt loop. Type `exit` or `quit` to stop, or press `Ctrl+C`.
-
-### Option C – VRAM diagnostic
+### Run VRAM Monitor
 
 ```bash
 python src/vram_monitor.py
 ```
 
-Prints a snapshot of currently allocated, reserved, and peak VRAM.
+### Basic User Flow
+1. Initialize ledger with `submission_prep.py`.
+2. Start either Streamlit or CLI interface.
+3. Send a prompt and inspect Observer state.
+4. Review calibrated Actor response.
+5. Reset the session when needed.
 
 ---
 
-## 🧠 How the Shadow Loop Works
+## Project Structure
 
+```text
+mirror_llm/
+├── app.py                     # Streamlit dashboard
+├── main.py                    # CLI orchestrator
+├── requirements.txt
+├── submission_prep.py         # Sanity/reset utility
+├── prompts/
+│   ├── observer_v1.txt
+│   └── actor_base.txt
+├── src/
+│   ├── agents.py              # Observer + Actor agents
+│   ├── storage_manager.py     # Ledger persistence/context retrieval
+│   └── vram_monitor.py        # GPU memory diagnostics
+└── documents/                 # Demo and judge-facing docs
 ```
-User message
-    │
-    ▼
-┌─────────────────────────────┐
-│  Observer (Llama-3.2 3B)    │  ← reads system prompt from prompts/observer_v1.txt
-│  Extracts:                  │
-│  • knowledge_gap            │
-│  • load_score (1–10)        │
-│  • vibe                     │
-│  • strategy_instruction     │
-└──────────────┬──────────────┘
-               │  JSON payload
-               ▼
-┌─────────────────────────────┐
-│  StorageManager             │  ← appends snapshot to data/session_mirror.json
-│  Provides last-3 context    │
-└──────────────┬──────────────┘
-               │  calibrated system prompt
-               ▼
-┌─────────────────────────────┐
-│  Actor (Llama-3.1 8B)       │  ← reads base prompt from prompts/actor_base.txt
-│  Generates personalised     │
-│  mentor reply               │
-└─────────────────────────────┘
-```
-
-VRAM is manually cleared (`torch.cuda.empty_cache()` + `gc.collect()`) between every Observer and Actor inference turn to prevent OOM errors on 6 GB hardware.
 
 ---
 
-*Built for the future of empathetic AI.*
+## Configuration
+
+Optional `.env` support is enabled via `python-dotenv`.
+
+```env
+HF_TOKEN=your_huggingface_token
+```
+
+Use this only when required for gated model access.
+
+---
+
+## Roadmap
+
+- [ ] Add automated tests for `StorageManager` and observer JSON parsing
+- [ ] Add CI workflow for lint/test checks
+- [ ] Add model/config abstraction for easier model swaps
+- [ ] Add export/import tooling for session ledgers
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Keep changes focused and well-scoped.
+4. Validate behavior locally.
+5. Open a pull request with clear technical context.
+
+For substantial changes, open an issue first to align on direction.
+
+---
+
+## FAQ
+
+**Why two models instead of one?**  
+The design separates analysis from generation to improve controllability and interpretability.
+
+**Does data leave my machine?**  
+By default, session history is stored locally in `data/session_mirror.json`.
+
+**Can this run on lower-end GPUs?**  
+The implementation targets 6GB VRAM using sequential inference and cache purging; lower-memory devices may require model substitutions.
+
+---
+
+## License
+
+No license file is currently present in this repository.  
+Add a `LICENSE` file (for example MIT/Apache-2.0) before distributing or accepting external contributions.
