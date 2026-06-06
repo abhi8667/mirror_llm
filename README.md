@@ -1,10 +1,10 @@
 # MIRROR LLM 🪞
 
-[![License](https://img.shields.io/github/license/abhi8667/mirror_llm)](LICENSE)
+[![License](https://img.shields.io/badge/license-unspecified-lightgrey)](#license)
 [![Release](https://img.shields.io/github/v/release/abhi8667/mirror_llm?include_prereleases)](https://github.com/abhi8667/mirror_llm/releases)
-[![Build](https://img.shields.io/badge/build-not%20configured-lightgrey)](https://github.com/abhi8667/mirror_llm/actions)
-[![Tests](https://img.shields.io/badge/tests-not%20configured-lightgrey)](https://github.com/abhi8667/mirror_llm/actions)
-[![Coverage](https://img.shields.io/badge/coverage-not%20configured-lightgrey)](https://github.com/abhi8667/mirror_llm)
+[![Build](https://img.shields.io/badge/build-not%20configured-lightgrey)](#roadmap)
+[![Tests](https://img.shields.io/badge/tests-not%20configured-lightgrey)](#roadmap)
+[![Coverage](https://img.shields.io/badge/coverage-not%20configured-lightgrey)](#roadmap)
 [![Docs](https://img.shields.io/badge/docs-README-blue)](README.md)
 [![Stars](https://img.shields.io/github/stars/abhi8667/mirror_llm)](https://github.com/abhi8667/mirror_llm/stargazers)
 [![Forks](https://img.shields.io/github/forks/abhi8667/mirror_llm)](https://github.com/abhi8667/mirror_llm/network/members)
@@ -174,11 +174,11 @@ python src/vram_monitor.py
 ```
 
 ### Basic User Flow Checklist
-- [x] Initialize ledger with `submission_prep.py`
-- [x] Start either Streamlit or CLI interface
-- [x] Send prompt and inspect Observer state
-- [x] Review calibrated Actor response
-- [x] Reset session when needed
+- [ ] Initialize ledger with `submission_prep.py`
+- [ ] Start either Streamlit or CLI interface
+- [ ] Send prompt and inspect Observer state
+- [ ] Review calibrated Actor response
+- [ ] Reset session when needed
 
 ---
 
@@ -252,4 +252,5 @@ The implementation targets 6GB VRAM using sequential inference and cache purging
 
 ## License
 
-This repository is licensed under the terms declared in the project license file.
+No license file is currently present in this repository.  
+Add a `LICENSE` file (for example MIT/Apache-2.0) before distributing or accepting external contributions.
